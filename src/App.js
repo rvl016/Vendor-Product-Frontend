@@ -1,26 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { MuiThemeProvider } from '@material-ui/core/styles';
+
+import MenuBarView from './components/common/MenuBarView';
+import VendorsView from './components/VendorsView';
+import VendorView from './components/VendorView';
+import ProductsView from './components/ProductsView';
+
+import { mui_theme } from './styles/themes';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+
+  render() {
+    return (
+      <MuiThemeProvider theme = { mui_theme }>
+        <MenuBarView/>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path = "/vendors/" render = { props => 
+              <VendorsView { ...props } /> } />
+            <Route exact path = "/products/" render = { props => 
+              <ProductsView { ...props } /> } />
+            <Route exact path = "/vendors/:vendor_id/" render = { props => 
+              <VendorView { ...props } /> } />
+          </Switch>
+        </BrowserRouter>
+      </MuiThemeProvider>
+    );
+  }
 }
 
 export default App;
