@@ -16,18 +16,28 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 
 import ControlBarView from './common/ControlBarView';
+import DeleteDialogView from './common/DeleteDialogView';
+import ModifyDialogView from './vendors/ModifyDialogView';
+import CreateDialogView from './vendors/CreateDialogView';
+
 import './VendorsView.scss';
 
 class VendorsView extends React.Component {
 
   constructor() {
     super();
+    this.delete_dialog_ref = React.createRef();
+    this.create_dialog_ref = React.createRef();
+
     this.state = {
       vendors_data: [],
       selected: {},
       current_page: 0,
       number_selected: 0,
-      rows_per_page: 10
+      rows_per_page: 10,
+
+      delete_dialog_open: false,
+      create_dialog_open: false
     };
   }
 
@@ -35,34 +45,43 @@ class VendorsView extends React.Component {
     await this.get_vendors();
   }
 
-  async make_vendor() {
-
+  make_vendor = async (vendor_data) => {
+    const response = await this.post_vendor_request( vendor_data);
+    if (response.status !== 201) return response
+    await this.get_vendors();
+    return response;
   }
 
-  
-
   async get_vendors() {
-    const response_body = await this.get_vendors_request();
-    const vendor_data = response_body.data;
+    const response = await this.get_vendors_request();
+    const vendor_data = response.body.data;
     this.update_state_with( vendor_data);
   }
 
-  async remove_vendors() {
-    const vendors_id = this.state.vendor_data.reduce( (acc, vendor) => 
+  remove_vendors = async () => {
+    const vendors_id = this.state.vendors_data.reduce( (acc, vendor) => 
       this.state.selected[vendor.id] ? acc.concat( vendor.id) : acc, []);
-    try {
-      await this.delete_vendors_request( vendors_id);
-      this.clean_vendors( vendors_id);
-    }
-    catch (error) {
-      console.log( error.message);
-    }
+    const response = await this.delete_vendors_request( { 
+      vendors: vendors_id 
+    });
+    if (response.status !== 200) return response;
+    this.clean_vendors( vendors_id);
+    return response;
   }
 
   clean_vendors( vendors_id) {
     const updated_vendors = this.state.vendors_data.filter( vendor => 
-      vendors_id.includes( vendor.id));
+      ! vendors_id.includes( vendor.id));
+    this.setState( { number_selected: 0 });
     this.update_state_with( updated_vendors);
+  }
+
+  toggle_create_dialog = () => {
+    this.setState( { create_dialog_open: ! this.state.create_dialog_open });
+  }
+
+  toggle_delete_dialog = () => {
+    this.setState( { delete_dialog_open: ! this.state.delete_dialog_open });
   }
 
   on_row_click = (event, vendor_id) => {
@@ -73,7 +92,7 @@ class VendorsView extends React.Component {
     const selected = { ...this.state.selected, 
       [vendor_id]: ! this.state.selected[vendor_id] };
     const number_selected = this.state.number_selected + 
-      selected[vendor_id] ? 1 : -1;
+      (selected[vendor_id] ? 1 : -1);
     this.setState( { selected, number_selected });
   }
 
@@ -89,7 +108,7 @@ class VendorsView extends React.Component {
   render() {
     return (
       <div>
-        <Paper class = "table-background">
+        <Paper className = "table-background">
           <VendorsTable { ...this.state } onCheck = { this.on_row_check } 
             onClick = { this.on_row_click }></VendorsTable>
           <TablePagination
@@ -106,7 +125,24 @@ class VendorsView extends React.Component {
             } }
           />
         </Paper>
-        <ControlBarView { ...this.state } />
+        <CreateDialog 
+          on_submit = { this.make_vendor } 
+          ref = { this.create_dialog_ref } 
+          open = { this.state.create_dialog_open }
+          on_toggle = { this.toggle_create_dialog } 
+        />
+        <DeleteDialog 
+          on_submit = { this.remove_vendors } 
+          number_selected = { this.state.number_selected }
+          ref = { this.delete_dialog_ref } 
+          open = { this.state.delete_dialog_open } 
+          on_toggle = { this.toggle_delete_dialog } 
+        />
+        <ControlBar 
+          number_selected = { this.state.number_selected }
+          toggle_delete = { this.toggle_delete_dialog } 
+          toggle_create = { this.toggle_create_dialog } 
+        />
       </div>
     );
   }
@@ -140,6 +176,17 @@ class VendorsView extends React.Component {
 
 export default VendorsView;
 
+const DeleteDialog = React.forwardRef( (props, ref) => (
+  <DeleteDialogView ref = { ref } { ...props } />
+));
+
+const CreateDialog = React.forwardRef( (props, ref) => (
+  <CreateDialogView ref = { ref } { ...props } />
+));
+
+const ControlBar = React.forwardRef( (props, ref) => (
+  <ControlBarView ref = { ref } { ...props } />
+));
 
 const VendorsTable = props => (
   <TableContainer>
@@ -154,7 +201,7 @@ const VendorsTable = props => (
 
 const VendorsTableHead = props => (
   <TableHead>
-    <TableRow>
+    <TableRow hover>
       <TableCell padding = "checkbox"></TableCell>
       <TableCell>Company</TableCell>
       <TableCell align = "right">CNPJ</TableCell>

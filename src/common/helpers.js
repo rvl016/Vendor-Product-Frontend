@@ -13,7 +13,7 @@ const create_request = (method, data) => ({
   headers: { 
     "origin": "*"
   },
-  ...( method != 'GET' && { body: JSON.stringify( data) })
+  ...( method !== 'GET' && { body: JSON.stringify( data) })
 });
 
 export const make_request_on_by_with = (request_name, request_arguments, 
@@ -23,8 +23,9 @@ export const make_request_on_by_with = (request_name, request_arguments,
 });
 
 export const call_api = async ( url, request) => {
-  const response = await fetch( url, request)
-  if (response.ok) return await response.json();
-  throw new Error( `Server returns code ${ response.status }! =(`);
+  const response = await fetch( url, request);
+  return { 
+    status: response.status, body: await response.json()
+  };
 };
 

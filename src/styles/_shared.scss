@@ -1,8 +1,27 @@
 @import 'styles/variables';
 
 body {
-  background-color: $background-medium-dark;
+  background-color: $background-medium;
   min-height: 100vh;
   color: $primary-text-color;
+}
 
+.MuiButton-root {
+  //color: $primary-text-color !important;
+  background-color: $background-dark !important;
+  padding: 6px 16px;
+  font-size: 0.875rem;
+  min-width: 64px;
+  box-sizing: border-box;
+  transition: $background-light 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 700 !important;
+  line-height: 1.75;
+  border-radius: 4px;
+  letter-spacing: 0.02857em;
+  text-transform: none !important;
+}
+
+.Mui-selected {
+  background-color: $background-dark !important;
 }
