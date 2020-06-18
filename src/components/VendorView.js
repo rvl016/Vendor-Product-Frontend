@@ -8,18 +8,16 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
 
 import ControlBarView from './common/ControlBarView';
 import DeleteDialogView from './common/DeleteDialogView';
 import ModifyDialogView from './vendor/ModifyDialogView';
 import CreateDialogView from './vendor/CreateDialogView';
 
+import Search from '../common/search';
 import * as helper from '../common/request_helpers';  
 import './VendorView.scss';
 
@@ -60,6 +58,7 @@ class VendorView extends React.Component {
     if (response.status != 200) return;
     const products_data = response.body.data;
     this.update_state_with( products_data);
+    Search.set_terms( this.state.products_data);
   }
 
   make_products = async (products_data) => {
@@ -95,6 +94,13 @@ class VendorView extends React.Component {
     this.setState( { number_selected: 0 });
     this.update_state_with( updated_products);
   }
+  
+  on_search = event => {
+    const phrase = event.target.value;
+    if (phrase === null || phrase === "") 
+      return;
+    this.update_state_with( Search.get_ordered_records( phrase));
+  }
 
   on_row_check = (event, product_id) => {
     const selected = { ...this.state.selected, 
@@ -117,6 +123,14 @@ class VendorView extends React.Component {
     return (
       <div>
         <Paper className = "table-background">
+          <TextField
+            className = "search-bar"
+            label = 'Search'
+            type = 'string'
+            variant = 'filled'
+            disabled = { this.state.products_data.length === 0 }
+            onChange = { this.on_search }
+          />
           <ProductsTable { ...this.state } onCheck = { this.on_row_check } 
             onClick = { this.on_row_click }></ProductsTable>
           <TablePagination
@@ -165,6 +179,7 @@ class VendorView extends React.Component {
     const selected = products_data.reduce( (acc, product_data) => ({ 
       [product_data.id]: false, ...acc 
     }), {});
+    Search.set_terms( products_data);
     this.setState( { products_data, selected });
   }
   

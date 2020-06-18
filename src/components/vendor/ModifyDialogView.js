@@ -60,7 +60,7 @@ class ModifyDialogView extends React.Component {
         open = { this.state.open } 
         onClose = { this.on_toggle }>
         <DialogTitle>
-          Modify { this.state.product_data.name } Vendor
+          Modify { this.state.product_data.name } Product
         </DialogTitle>
         <DialogContent>
           <form>

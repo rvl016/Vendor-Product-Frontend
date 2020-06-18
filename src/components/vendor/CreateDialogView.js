@@ -34,7 +34,6 @@ class CreateDialogView extends React.Component {
     console.log( data)
     const response = await this.submit( data);
     if (response.status === 201) return this.on_toggle();
-    console.log( response.body);
     this.set_errors( response.body.errors);
   };
 
@@ -44,7 +43,6 @@ class CreateDialogView extends React.Component {
   }
 
   on_product_change = index => field => event => {
-    console.log( index)
     const products_forms = this.state.products_forms;
     products_forms[index][field] = event.target.value;
     this.setState( { products_forms });

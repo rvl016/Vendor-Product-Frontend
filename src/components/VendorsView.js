@@ -7,18 +7,16 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
 
 import ControlBarView from './common/ControlBarView';
 import DeleteDialogView from './common/DeleteDialogView';
 import ModifyDialogView from './vendors/ModifyDialogView';
 import CreateDialogView from './vendors/CreateDialogView';
 
+import Search from '../common/search';
 import * as helper from '../common/request_helpers';  
 import './VendorsView.scss';
 
@@ -26,11 +24,12 @@ class VendorsView extends React.Component {
 
   constructor( props) {
     super( props);
-
     props.set_view_name( "Vendors View");
+
     this.state = {
       vendors_data: [],
       selected: {},
+
       current_page: 0,
       number_selected: 0,
       rows_per_page: 10,
@@ -57,6 +56,7 @@ class VendorsView extends React.Component {
     if (response.status != 200) return;
     const vendor_data = response.body.data;
     this.update_state_with( vendor_data);
+    Search.set_terms( this.state.vendors_data);
   }
 
   modify_vendor = async (vendor_data) => {
@@ -88,6 +88,13 @@ class VendorsView extends React.Component {
     this.update_state_with( updated_vendors);
   }
 
+  on_search = event => {
+    const phrase = event.target.value;
+    if (phrase === null || phrase === "") 
+      return;
+    this.update_state_with( Search.get_ordered_records( phrase));
+  }
+
   on_row_click = (event, vendor_id) => {
     this.props.history.push( `/vendors/${ vendor_id }`); 
   }
@@ -113,8 +120,17 @@ class VendorsView extends React.Component {
     return (
       <div>
         <Paper className = "table-background">
+          <TextField
+            className = "search-bar"
+            label = 'Search'
+            type = 'string'
+            variant = 'filled'
+            disabled = { this.state.vendors_data.length === 0 }
+            onChange = { this.on_search }
+          />
           <VendorsTable { ...this.state } onCheck = { this.on_row_check } 
-            onClick = { this.on_row_click }></VendorsTable>
+            onClick = { this.on_row_click } 
+          />
           <TablePagination
             component = "div"
             count = { this.state.vendors_data.length }
@@ -161,6 +177,7 @@ class VendorsView extends React.Component {
     const selected = vendors_data.reduce( (acc, vendor_data) => ({ 
       [vendor_data.id]: false, ...acc 
     }), {});
+    Search.set_terms( vendors_data);
     this.setState( { vendors_data, selected });
   }
 

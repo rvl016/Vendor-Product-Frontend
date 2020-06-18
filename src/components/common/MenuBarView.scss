@@ -1,8 +1,10 @@
 
-.buttons {
-  align-items: center;
+.app-bar-buttons {
+  margin-left: auto;
+  margin-right: 44vw;
+  display: flex;
 }
 
-.buttons > div {
+.app-bar-buttons > div {
   margin-right: 20px;
 }

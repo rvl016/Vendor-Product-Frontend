@@ -33,3 +33,8 @@ body {
 .form > div {
   margin-right: 15px;
 }
+
+.search-bar {
+  background-color: $background-medium;
+  display: flex !important;
+}

@@ -40,15 +40,13 @@ class MenuBarView extends React.Component {
           <Typography variant = "h6">
             { this.state.view_name }
           </Typography>
-          <div className = "buttons">
-            <ActionButton tag = "Vendors" 
-              onClick = { () => this.props.history.push( "/vendors") }
-              disabled = { this.state.view_name === "Vendors View" }
-            />
-            <ActionButton tag = "Products"
-              onClick = { () => this.props.history.push( "/products")} 
-              disabled = { this.state.view_name === "Products View" }
-            />
+          <div className = "app-bar-buttons">
+            <div>
+              <ActionButton tag = "All Vendors" 
+                onClick = { () => this.props.history.push( "/vendors") }
+                disabled = { this.state.view_name === "Vendors View" }
+              />
+            </div>
           </div>
         </Toolbar>
       </AppBar>

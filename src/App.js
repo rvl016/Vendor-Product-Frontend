@@ -2,10 +2,10 @@ import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 
+
 import MenuBarView from './components/common/MenuBarView';
 import VendorsView from './components/VendorsView';
 import VendorView from './components/VendorView';
-import ProductsView from './components/ProductsView';
 
 import { mui_theme } from './styles/themes';
 import './App.css';
@@ -16,7 +16,8 @@ class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      view_name: "Vendors View"
+      view_name: "Vendors View",
+      backdrop_open: false,
     }
   }
 
@@ -32,13 +33,10 @@ class App extends React.Component {
           <div className = "spacer"></div>
           <Switch>
             <Route exact path = "/vendors/" render = { props => 
-              <VendorsView { ...props } 
-                set_view_name = { this.set_view_name } /> } />
-            <Route exact path = "/products/" render = { props => 
-              <ProductsView { ...props } 
+              <VendorsView { ...props }
                 set_view_name = { this.set_view_name } /> } />
             <Route exact path = "/vendors/:vendor_id/" render = { props => 
-              <VendorView { ...props } 
+              <VendorView
                 set_view_name = { this.set_view_name } /> } />
             <Redirect to = "/vendors/" />
           </Switch>
