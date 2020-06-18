@@ -5,7 +5,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent'; 
 import DialogActions from '@material-ui/core/DialogActions'; 
 import Dialog from '@material-ui/core/Dialog'; 
-import TextField from '@material-ui/core/TextField';
+
+import { product_form, product_errors, ProductForm } from '../../common/forms';
+import { filter_null_and_blanks } from '../../common/general_helpers';
 
 import './ModifyDialogView.scss';
 
@@ -26,11 +28,11 @@ class ModifyDialogView extends React.Component {
   componentWillReceiveProps( props) {
     const product_data = props.products_data.filter( product =>
       props.selected[product.id])[0];
-    const product_form = product_data ? this.copy_data_to_form( 
-      product_data) : this.state.product_form;
+    const current_product_form = product_data ? this.copy_data_to_form( 
+      product_data) : { ...product_form };
     const product_id = product_data ? product_data.id : null;
-    this.setState( { open: props.open, product_form, 
-      product_data, product_id });
+    this.setState( { open: props.open, product_form: current_product_form, 
+      product_data, product_id, product_errors: { ...product_errors } });
   }
 
   on_submit = async () => {
@@ -64,7 +66,7 @@ class ModifyDialogView extends React.Component {
         </DialogTitle>
         <DialogContent>
           <form>
-            <VendorForm 
+            <ProductForm 
               on_change = { this.on_product_change }
               errors = { this.state.product_errors }
               default = { this.state.product_data }
@@ -94,7 +96,7 @@ class ModifyDialogView extends React.Component {
   }
 
   make_submition_data() {
-    const product = this.filter_null_and_blanks( this.state.product_form);
+    const product = filter_null_and_blanks( this.state.product_form);
     return { product };
   }
 
@@ -106,81 +108,6 @@ class ModifyDialogView extends React.Component {
     return product_form;
   }
   
-  filter_null_and_blanks( data) {
-    return Object.keys( data).reduce( (acc, key) => ({
-      ...( data[key] !== null && data[key] !== "" && { [key]: data[key] }),
-      ...acc
-    }), {});
-  }
 }
 
 export default ModifyDialogView;
-
-const VendorForm = props => (
-  <>
-    <div className = "product-form form">
-      <div>
-        <TextField
-          defaultValue = { props.default.name }
-          error = { props.errors.name.error }
-          margin = 'none'
-          id = 'name'
-          label = 'Name'
-          type = 'name'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'name') }
-          helperText = { props.errors.name.message }
-        />
-      </div>
-      <div>
-        <TextField
-          defaultValue = { props.default.code }
-          error = { props.errors.code.error }
-          margin = 'none'
-          id = 'code'
-          label = 'UPC-A Code'
-          type = 'string'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'code') }
-          helperText = { props.errors.code.message }
-        />
-      </div>
-      <div>
-        <TextField
-          defaultValue = { props.default.price }
-          error = { props.errors.price.error }
-          margin = 'none'
-          id = 'price'
-          label = 'Price'
-          type = 'number'
-          variant = 'filled'
-          onChange = { props.on_change( 'price') }
-          helperText = { props.errors.price.message }
-        />
-      </div>
-    </div>
-  </>
-);
-
-const product_form = {
-  name: "",
-  code: "",
-  price: null
-};
-
-const product_errors = {
-  name: {
-    error: false,
-    message: null
-  },
-  code: {
-    error: false,
-    message: null
-  },
-  price: {
-    error: false,
-    message: null
-  }
-};

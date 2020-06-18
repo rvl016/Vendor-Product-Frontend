@@ -5,9 +5,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent'; 
 import DialogActions from '@material-ui/core/DialogActions'; 
 import Dialog from '@material-ui/core/Dialog'; 
-import TextField from '@material-ui/core/TextField';
 import { Typography } from '@material-ui/core';
 
+import { filter_null_and_blanks } from '../../common/general_helpers';
+import { VendorForm, ProductForm, vendor_form, product_form, 
+  vendor_errors, product_errors } from '../../common/forms';
 
 import './CreateDialogView.scss';
 
@@ -28,6 +30,11 @@ class CreateDialogView extends React.Component {
   }
 
   componentWillReceiveProps( props) {
+    if (props.open)
+      this.setState( { vendor_errors: { ...vendor_errors },
+        vendor_form: { ...vendor_form }, products_forms: [],
+        products_errors: [] });
+    this.products_number = 0;
     this.setState( { open: props.open });
   }
 
@@ -77,13 +84,13 @@ class CreateDialogView extends React.Component {
         <DialogTitle>Create New Vendor</DialogTitle>
         <DialogContent>
           <form>
-            <VendorForm 
+            <TitledVendorForm 
               on_change = { this.on_vendor_change }
               errors = { this.state.vendor_errors }
             />
             <div className = "products-forms">
             { this.state.products_forms.map( (product_form, idx) => (
-              <ProductForm 
+              <TitledProductForm 
                 index = { idx }
                 key = { idx } 
                 on_change = { this.on_product_change( idx) }
@@ -131,9 +138,9 @@ class CreateDialogView extends React.Component {
   }
 
   make_submition_data() {
-    const vendor = this.filter_null_and_blanks( this.state.vendor_form);
+    const vendor = filter_null_and_blanks( this.state.vendor_form);
     const products = this.state.products_forms.map( 
-      product_form => this.filter_null_and_blanks( product_form)
+      product_form => filter_null_and_blanks( product_form)
     );
     return {
       vendor,
@@ -141,146 +148,20 @@ class CreateDialogView extends React.Component {
     };
   }
 
-  filter_null_and_blanks( data) {
-    return Object.keys( data).reduce( (acc, key) => ({
-      ...( data[key] != null && data[key] != "" && { [key]: data[key] }),
-      ...acc
-    }), {});
-  }
 }
 
 export default CreateDialogView;
 
-const VendorForm = props => (
+const TitledVendorForm = props => (
   <>
     <div><Typography>Vendor</Typography></div>
-    <div className = "vendor-form form">
-      <div>
-        <TextField
-          error = { props.errors.name.error }
-          margin = 'none'
-          id = 'name'
-          label = 'Name'
-          type = 'name'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'name') }
-          helperText = { props.errors.name.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.cnpj.error }
-          margin = 'none'
-          id = 'username'
-          label = 'CNPJ'
-          type = 'string'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'cnpj') }
-          helperText = { props.errors.cnpj.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.city.error }
-          margin = 'none'
-          id = 'city'
-          label = 'City'
-          type = 'city'
-          variant = 'filled'
-          onChange = { props.on_change( 'city') }
-          helperText = { props.errors.city.message }
-        />
-      </div>
-    </div>
+    <VendorForm { ...props } />
   </>
 );
 
-const ProductForm = props => (
+const TitledProductForm = props => (
   <>
     <div><Typography>Product { props.index + 1 }</Typography></div>
-    <div className = "product-form form" key = { props.index }>
-      <div>
-        <TextField
-          error = { props.errors.name.error }
-          margin = 'none'
-          id = 'name'
-          label = 'Name'
-          type = 'name'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'name') }
-          helperText = { props.errors.name.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.code.error }
-          margin = 'none'
-          id = 'username'
-          label = 'UPC-A code'
-          type = 'string'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'code') }
-          helperText = { props.errors.code.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.price.error }
-          margin = 'none'
-          id = 'price'
-          label = 'Price'
-          type = 'number'
-          variant = 'filled'
-          onChange = { props.on_change( 'price') }
-          helperText = { props.errors.price.message }
-        />
-      </div>
-    </div>
+    <ProductForm { ...props } />
   </>
 );
-
-const product_form = { 
-  name: "",
-  code: "",
-  price: null
-};
-
-const product_errors = {
-  name: {
-    error: false,
-    message: null
-  },
-  code: {
-    error: false,
-    message: null
-  },
-  price: {
-    error: false,
-    message: null
-  }
-};
-
-const vendor_form = {
-  name: "",
-  cnpj: "",
-  city: ""
-};
-
-const vendor_errors = {
-  name: {
-    error: false,
-    message: null
-  },
-  cnpj: {
-    error: false,
-    message: null
-  },
-  city: {
-    error: false,
-    message: null
-  }
-};

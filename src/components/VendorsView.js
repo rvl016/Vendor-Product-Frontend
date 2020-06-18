@@ -1,20 +1,15 @@
 import React from 'react';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 
 import ControlBarView from './common/ControlBarView';
 import DeleteDialogView from './common/DeleteDialogView';
 import ModifyDialogView from './vendors/ModifyDialogView';
 import CreateDialogView from './vendors/CreateDialogView';
+
+import VendorsTable from './vendors/table';
 
 import Search from '../common/search';
 import * as helper from '../common/request_helpers';  
@@ -30,8 +25,8 @@ class VendorsView extends React.Component {
       vendors_data: [],
       selected: {},
 
-      current_page: 0,
       number_selected: 0,
+      current_page: 0,
       rows_per_page: 10,
 
       delete_dialog_open: false,
@@ -59,10 +54,7 @@ class VendorsView extends React.Component {
     Search.set_terms( this.state.vendors_data);
   }
 
-  modify_vendor = async (vendor_data) => {
-    const vendor_id = Object.keys( this.state.selected).reduce( (id, key) => 
-      this.state.selected[key] ? key : null
-    , null)
+  modify_vendor = async (vendor_data, vendor_id) => {
     const response = await this.put_vendor_request( vendor_data, vendor_id);
     if (response.status !== 200) return response
     this.setState( { number_selected: 0 });
@@ -92,7 +84,7 @@ class VendorsView extends React.Component {
     const phrase = event.target.value;
     if (phrase === null || phrase === "") 
       return;
-    this.update_state_with( Search.get_ordered_records( phrase));
+    this.setState( { vendors_data: Search.get_ordered_records( phrase) });
   }
 
   on_row_click = (event, vendor_id) => {
@@ -178,7 +170,7 @@ class VendorsView extends React.Component {
       [vendor_data.id]: false, ...acc 
     }), {});
     Search.set_terms( vendors_data);
-    this.setState( { vendors_data, selected });
+    this.setState( { vendors_data, selected, number_selected: 0 });
   }
 
   toggle_create_dialog = () => {
@@ -220,59 +212,3 @@ class VendorsView extends React.Component {
 }
 
 export default VendorsView;
-
-const VendorsTable = props => (
-  <TableContainer>
-    <Table stickyHeader aria-label = "sticky table">
-      <VendorsTableHead/>
-      <TableBody>
-        <VendorsTableContent { ...props }/>
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
-
-const VendorsTableHead = props => (
-  <TableHead>
-    <TableRow hover>
-      <TableCell padding = "checkbox"></TableCell>
-      <TableCell>Company</TableCell>
-      <TableCell align = "right">CNPJ</TableCell>
-      <TableCell align = "right">City</TableCell>
-    </TableRow>
-  </TableHead>
-);
-
-const VendorsTableContent = props => (
-  <>
-    { props.vendors_data.map( vendor_data => (
-      <TableRow
-        hover 
-        key = { vendor_data.id } 
-        style = {{ cursor: 'pointer' }}
-        role = "checkbox"
-        aria-checked = { props.selected[vendor_data.id] }
-        tabIndex = { -1 }
-        selected = { props.selected[vendor_data.id] }
-      >
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked = { props.selected[vendor_data.id] }
-            onClick = { event => props.onCheck( event, vendor_data.id) }
-            inputProps = {{ 'aria-labelledby': vendor_data.id }}
-          />
-        </TableCell>
-        <TableCell 
-          onClick = { event => props.onClick( event, vendor_data.id) }
-        >
-          { vendor_data.name }</TableCell>
-        <TableCell align="right" 
-          onClick = { event => props.onClick( event, vendor_data.id) }>
-          { vendor_data.cnpj }</TableCell>
-        <TableCell align="right"
-          onClick = { event => props.onClick( event, vendor_data.id) }>
-          { vendor_data.city || "Not Available" }</TableCell>
-      </TableRow>
-    ))}
-  </>
-);

@@ -5,8 +5,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent'; 
 import DialogActions from '@material-ui/core/DialogActions'; 
 import Dialog from '@material-ui/core/Dialog'; 
-import TextField from '@material-ui/core/TextField';
 
+import { product_form, product_errors, ProductForm } from '../../common/forms';
+import { filter_null_and_blanks } from '../../common/general_helpers';
 
 import './CreateDialogView.scss';
 import { Typography } from '@material-ui/core';
@@ -17,8 +18,8 @@ class CreateDialogView extends React.Component {
     super( props);
     this.state = {
       open: this.props.open,
-      products_forms: [ { ...product_form }],
-      products_errors: [ { ...product_errors }]
+      products_forms: [{ ...product_form }],
+      products_errors: [{ ...product_errors }]
     };
     this.products_number = 1;
     this.on_toggle = props.on_toggle;
@@ -26,12 +27,14 @@ class CreateDialogView extends React.Component {
   }
 
   componentWillReceiveProps( props) {
+    if (props.open) 
+      this.setState( { products_errors: [{ ...product_errors }],
+        products_forms: [{ ...product_form }]});
     this.setState( { open: props.open });
   }
 
   on_submit = async () => {
     const data = this.make_submition_data();
-    console.log( data)
     const response = await this.submit( data);
     if (response.status === 201) return this.on_toggle();
     this.set_errors( response.body.errors);
@@ -68,7 +71,7 @@ class CreateDialogView extends React.Component {
           <form>
             <div className = "products-forms">
             { this.state.products_forms.map( (product_form, idx) => (
-              <ProductForm 
+              <ProductsForm 
                 index = { idx }
                 key = { idx } 
                 on_change = { this.on_product_change( idx) }
@@ -107,89 +110,17 @@ class CreateDialogView extends React.Component {
 
   make_submition_data() {
     const products = this.state.products_forms.map( 
-      product_form => this.filter_null_and_blanks( product_form)
+      product_form => filter_null_and_blanks( product_form)
     );
     return { products };
-  }
-
-  filter_null_and_blanks( data) {
-    return Object.keys( data).reduce( (acc, key) => ({
-      ...( data[key] != null && data[key] != "" && { [key]: data[key] }),
-      ...acc
-    }), {});
   }
 }
 
 export default CreateDialogView;
 
-const ProductForm = props => (
+const ProductsForm = props => (
   <>
     <div><Typography>Product { props.index + 1 }</Typography></div>
-    <div className = "product-form form" key = { props.index }>
-      <div>
-        <TextField
-          error = { props.errors.name.error }
-          margin = 'none'
-          id = 'name'
-          label = 'Name'
-          type = 'name'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'name') }
-          helperText = { props.errors.name.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.code.error || props.errors.__all__.error }
-          margin = 'none'
-          id = 'username'
-          label = 'UPC-A code'
-          type = 'string'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'code') }
-          helperText = { props.errors.code.message 
-            || props.errors.__all__.message }
-        />
-      </div>
-      <div>
-        <TextField
-          error = { props.errors.price.error }
-          margin = 'none'
-          id = 'price'
-          label = 'Price'
-          type = 'number'
-          variant = 'filled'
-          onChange = { props.on_change( 'price') }
-          helperText = { props.errors.price.message }
-        />
-      </div>
-    </div>
+    <ProductForm { ...props } />
   </>
 );
-
-const product_form = { 
-  name: "",
-  code: "",
-  price: null
-};
-
-const product_errors = {
-  name: {
-    error: false,
-    message: null
-  },
-  code: {
-    error: false,
-    message: null
-  },
-  price: {
-    error: false,
-    message: null
-  },
-  __all__: {
-    error: false,
-    message: null
-  }
-};

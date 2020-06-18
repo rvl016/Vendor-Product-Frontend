@@ -1,21 +1,16 @@
 import React from 'react';
 import { withRouter } from "react-router-dom";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
 
 import ControlBarView from './common/ControlBarView';
 import DeleteDialogView from './common/DeleteDialogView';
 import ModifyDialogView from './vendor/ModifyDialogView';
 import CreateDialogView from './vendor/CreateDialogView';
+
+import ProductsTable from './vendor/table';
 
 import Search from '../common/search';
 import * as helper from '../common/request_helpers';  
@@ -99,7 +94,7 @@ class VendorView extends React.Component {
     const phrase = event.target.value;
     if (phrase === null || phrase === "") 
       return;
-    this.update_state_with( Search.get_ordered_records( phrase));
+    this.setState( { products_data: Search.get_ordered_records( phrase) });
   }
 
   on_row_check = (event, product_id) => {
@@ -180,7 +175,7 @@ class VendorView extends React.Component {
       [product_data.id]: false, ...acc 
     }), {});
     Search.set_terms( products_data);
-    this.setState( { products_data, selected });
+    this.setState( { products_data, selected, number_selected: 0 });
   }
   
   toggle_create_dialog = () => {
@@ -232,54 +227,3 @@ class VendorView extends React.Component {
 
 export default withRouter( VendorView);
 
-
-const ProductsTable = props => (
-  <TableContainer>
-    <Table stickyHeader aria-label = "sticky table">
-      <ProductsTableHead/>
-      <TableBody>
-        <ProductsTableContent { ...props }/>
-      </TableBody>
-    </Table>
-  </TableContainer>
-);
-
-const ProductsTableHead = props => (
-  <TableHead>
-    <TableRow hover>
-      <TableCell padding = "checkbox"></TableCell>
-      <TableCell>Product Name</TableCell>
-      <TableCell align = "right">UPC-A Code</TableCell>
-      <TableCell align = "right">Price</TableCell>
-    </TableRow>
-  </TableHead>
-);
-
-const ProductsTableContent = props => (
-  <>
-    { props.products_data.map( product_data => (
-      <TableRow
-        hover 
-        key = { product_data.id } 
-        role = "checkbox"
-        aria-checked = { props.selected[product_data.id] }
-        tabIndex = { -1 }
-        selected = { props.selected[product_data.id] }
-      >
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked = { props.selected[product_data.id] }
-            onClick = { event => props.onCheck( event, product_data.id) }
-            inputProps = {{ 'aria-labelledby': product_data.id }}
-          />
-        </TableCell>
-        <TableCell>
-          { product_data.name }</TableCell>
-        <TableCell align="right" >
-          { product_data.code }</TableCell>
-        <TableCell align="right" >
-          { product_data.price || "Not Available" }</TableCell>
-      </TableRow>
-    ))}
-  </>
-);

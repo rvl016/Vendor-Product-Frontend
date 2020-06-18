@@ -5,7 +5,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent'; 
 import DialogActions from '@material-ui/core/DialogActions'; 
 import Dialog from '@material-ui/core/Dialog'; 
-import TextField from '@material-ui/core/TextField';
+
+import { filter_null_and_blanks } from '../../common/general_helpers';
+import { VendorForm, vendor_form, vendor_errors } from '../../common/forms';
 
 import './ModifyDialogView.scss';
 
@@ -16,7 +18,8 @@ class ModifyDialogView extends React.Component {
     this.state = {
       open: this.props.open,
       vendor_form: { ...vendor_form },
-      vendor_errors: { ...vendor_errors }
+      vendor_errors: { ...vendor_errors },
+      vendor_id: null
     };
     this.on_toggle = props.on_toggle;
     this.submit = props.on_submit;
@@ -25,13 +28,14 @@ class ModifyDialogView extends React.Component {
   componentWillReceiveProps( props) {
     const vendor_data = props.vendors_data.filter( vendor =>
       props.selected[vendor.id])[0];
-    this.setState( { open: props.open, 
-      vendor_data: vendor_data });
+    const vendor_id = vendor_data ? vendor_data.id : null;
+    this.setState( { open: props.open, vendor_id,
+      vendor_data: vendor_data, vendor_errors: { ...vendor_errors } });
   }
 
   on_submit = async () => {
     const data = this.make_submition_data();
-    const response = await this.submit( data);
+    const response = await this.submit( data, this.state.vendor_id);
     if (response.status === 200) return this.on_toggle();
     this.set_errors( response.body.errors);
   };
@@ -90,7 +94,7 @@ class ModifyDialogView extends React.Component {
   }
 
   make_submition_data() {
-    const vendor = this.filter_null_and_blanks( this.state.vendor_form);
+    const vendor = filter_null_and_blanks( this.state.vendor_form);
     return { vendor };
   }
 
@@ -103,72 +107,3 @@ class ModifyDialogView extends React.Component {
 }
 
 export default ModifyDialogView;
-
-const VendorForm = props => (
-  <>
-    <div className = "vendor-form form">
-      <div>
-        <TextField
-          defaultValue = { props.default.name }
-          error = { props.errors.name.error }
-          margin = 'none'
-          id = 'name'
-          label = 'Name'
-          type = 'name'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'name') }
-          helperText = { props.errors.name.message }
-        />
-      </div>
-      <div>
-        <TextField
-          defaultValue = { props.default.cnpj }
-          error = { props.errors.cnpj.error }
-          margin = 'none'
-          id = 'username'
-          label = 'CNPJ'
-          type = 'string'
-          variant = 'filled'
-          required
-          onChange = { props.on_change( 'cnpj') }
-          helperText = { props.errors.cnpj.message }
-        />
-      </div>
-      <div>
-        <TextField
-          defaultValue = { props.default.city }
-          error = { props.errors.city.error }
-          margin = 'none'
-          id = 'city'
-          label = 'City'
-          type = 'city'
-          variant = 'filled'
-          onChange = { props.on_change( 'city') }
-          helperText = { props.errors.city.message }
-        />
-      </div>
-    </div>
-  </>
-);
-
-const vendor_form = {
-  name: "",
-  cnpj: "",
-  city: ""
-};
-
-const vendor_errors = {
-  name: {
-    error: false,
-    message: null
-  },
-  cnpj: {
-    error: false,
-    message: null
-  },
-  city: {
-    error: false,
-    message: null
-  }
-};
