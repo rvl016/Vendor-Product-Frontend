@@ -15,40 +15,44 @@ class ModifyDialogView extends React.Component {
     super( props);
     this.state = {
       open: this.props.open,
-      vendor_form: { ...vendor_form },
-      vendor_errors: { ...vendor_errors }
+      product_form: { ...product_form },
+      product_errors: { ...product_errors },
+      product_id: null
     };
     this.on_toggle = props.on_toggle;
     this.submit = props.on_submit;
   }
 
   componentWillReceiveProps( props) {
-    const vendor_data = props.vendors_data.filter( vendor =>
-      props.selected[vendor.id])[0];
-    this.setState( { open: props.open, 
-      vendor_data: vendor_data });
+    const product_data = props.products_data.filter( product =>
+      props.selected[product.id])[0];
+    const product_form = product_data ? this.copy_data_to_form( 
+      product_data) : this.state.product_form;
+    const product_id = product_data ? product_data.id : null;
+    this.setState( { open: props.open, product_form, 
+      product_data, product_id });
   }
 
   on_submit = async () => {
     const data = this.make_submition_data();
-    const response = await this.submit( data);
+    const response = await this.submit( data, this.state.product_id);
     if (response.status === 200) return this.on_toggle();
     this.set_errors( response.body.errors);
   };
 
   set_errors( errors) {
-    const vendor_errors = this.get_vendor_errors( errors);
-    this.setState( { vendor_errors }) 
+    const product_errors = this.get_product_errors( errors);
+    this.setState( { product_errors }) 
   }
 
-  on_vendor_change = field => event => {
-    const vendor_form = this.state.vendor_form;
-    vendor_form[field] = event.target.value;
-    this.setState( { vendor_form })
+  on_product_change = field => event => {
+    const product_form = this.state.product_form;
+    product_form[field] = event.target.value;
+    this.setState( { product_form })
   };
 
   render() {
-    if (! this.state.vendor_data)
+    if (! this.state.product_data)
       return (<></>);
     return (
       <Dialog 
@@ -56,14 +60,14 @@ class ModifyDialogView extends React.Component {
         open = { this.state.open } 
         onClose = { this.on_toggle }>
         <DialogTitle>
-          Modify { this.state.vendor_data.name } Vendor
+          Modify { this.state.product_data.name } Vendor
         </DialogTitle>
         <DialogContent>
           <form>
             <VendorForm 
-              on_change = { this.on_vendor_change }
-              errors = { this.state.vendor_errors }
-              default = { this.state.vendor_data }
+              on_change = { this.on_product_change }
+              errors = { this.state.product_errors }
+              default = { this.state.product_data }
             />
           </form>
         </DialogContent>
@@ -79,8 +83,8 @@ class ModifyDialogView extends React.Component {
     );
   }
 
-  get_vendor_errors( errors) {
-    return Object.keys( this.state.vendor_errors).reduce( (acc, key) => ({ 
+  get_product_errors( errors) {
+    return Object.keys( this.state.product_errors).reduce( (acc, key) => ({ 
       [key]: { 
         error: errors.hasOwnProperty( key), 
         message: errors[key] && errors[key][0]
@@ -90,10 +94,18 @@ class ModifyDialogView extends React.Component {
   }
 
   make_submition_data() {
-    const vendor = this.filter_null_and_blanks( this.state.vendor_form);
-    return { vendor };
+    const product = this.filter_null_and_blanks( this.state.product_form);
+    return { product };
   }
 
+  copy_data_to_form( product_data) {
+    const product_form = this.state.product_form;
+    product_form.name = product_data.name;
+    product_form.code = product_data.code;
+    product_form.price = product_data.price;
+    return product_form;
+  }
+  
   filter_null_and_blanks( data) {
     return Object.keys( data).reduce( (acc, key) => ({
       ...( data[key] !== null && data[key] !== "" && { [key]: data[key] }),
@@ -106,7 +118,7 @@ export default ModifyDialogView;
 
 const VendorForm = props => (
   <>
-    <div className = "vendor-form form">
+    <div className = "product-form form">
       <div>
         <TextField
           defaultValue = { props.default.name }
@@ -123,51 +135,51 @@ const VendorForm = props => (
       </div>
       <div>
         <TextField
-          defaultValue = { props.default.cnpj }
-          error = { props.errors.cnpj.error }
+          defaultValue = { props.default.code }
+          error = { props.errors.code.error }
           margin = 'none'
-          id = 'username'
-          label = 'CNPJ'
+          id = 'code'
+          label = 'UPC-A Code'
           type = 'string'
           variant = 'filled'
           required
-          onChange = { props.on_change( 'cnpj') }
-          helperText = { props.errors.cnpj.message }
+          onChange = { props.on_change( 'code') }
+          helperText = { props.errors.code.message }
         />
       </div>
       <div>
         <TextField
-          defaultValue = { props.default.city }
-          error = { props.errors.city.error }
+          defaultValue = { props.default.price }
+          error = { props.errors.price.error }
           margin = 'none'
-          id = 'city'
-          label = 'City'
-          type = 'city'
+          id = 'price'
+          label = 'Price'
+          type = 'number'
           variant = 'filled'
-          onChange = { props.on_change( 'city') }
-          helperText = { props.errors.city.message }
+          onChange = { props.on_change( 'price') }
+          helperText = { props.errors.price.message }
         />
       </div>
     </div>
   </>
 );
 
-const vendor_form = {
+const product_form = {
   name: "",
-  cnpj: "",
-  city: ""
+  code: "",
+  price: null
 };
 
-const vendor_errors = {
+const product_errors = {
   name: {
     error: false,
     message: null
   },
-  cnpj: {
+  code: {
     error: false,
     message: null
   },
-  city: {
+  price: {
     error: false,
     message: null
   }

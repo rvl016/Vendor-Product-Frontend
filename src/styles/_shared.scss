@@ -22,6 +22,14 @@ body {
   text-transform: none !important;
 }
 
+.MuiDialog-paperWidthSm {
+  max-width: -1px !important;
+}
+
 .Mui-selected {
   background-color: $background-dark !important;
+}
+
+.form > div {
+  margin-right: 15px;
 }

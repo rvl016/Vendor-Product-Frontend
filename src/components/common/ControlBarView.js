@@ -1,9 +1,6 @@
 import React from 'react';
 
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import { ActionButton } from '../../common/buttons';
 
 import './ControlBarView.scss';
 
@@ -13,7 +10,6 @@ class ControlBarView extends React.Component {
   constructor( props) {
     super( props);
     
-    console.log( props.ref)
     this.toggle_create_dialog = props.toggle_create ? 
       props.toggle_create : null;
     this.toggle_delete_dialog = props.toggle_delete ? 
@@ -40,7 +36,7 @@ class ControlBarView extends React.Component {
           </div>
           <div id = "modify-button">
             <ActionButton tag = "Modify"
-              disabled = { this.state.number_selected === 0 }
+              disabled = { this.state.number_selected !== 1 }
               onClick = { this.toggle_modify_dialog }/>
           </div>
           <div id = "delete-button">
@@ -50,9 +46,9 @@ class ControlBarView extends React.Component {
           </div>
         </div>
         <div className = "selected-div">
-          <div id = "selected-field">
+          <p className = "selected-field">
             Selected: { this.state.number_selected }
-          </div>
+          </p>
         </div>
       </div>
     );
@@ -60,18 +56,4 @@ class ControlBarView extends React.Component {
 }
 
 export default ControlBarView;
-
-const ActionButton = props => (
-  <Button 
-    tag = { props.tag }
-    disabled = { props.disabled }
-    disableRipple = { true }
-    edge = "start" 
-    className = "action-button" 
-    color = "inherit"
-    onClick = { props.onClick }
-  >
-    <Typography>{ props.tag }</Typography>
-  </Button>
-);
 

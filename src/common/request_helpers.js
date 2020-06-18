@@ -24,6 +24,10 @@ export const make_request_on_by_with = (request_name, request_arguments,
 
 export const call_api = async ( url, request) => {
   const response = await fetch( url, request);
+  if (response.status == 204)
+    return {
+      status: 204, body: {}      
+    };
   return { 
     status: response.status, body: await response.json()
   };
