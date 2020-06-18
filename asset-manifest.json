@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/Vendor-Product-Frontend/static/css/main.ffba3b6a.chunk.css",
+    "main.js": "/Vendor-Product-Frontend/static/js/main.63f8096e.chunk.js",
+    "main.js.map": "/Vendor-Product-Frontend/static/js/main.63f8096e.chunk.js.map",
+    "runtime-main.js": "/Vendor-Product-Frontend/static/js/runtime-main.60d0958d.js",
+    "runtime-main.js.map": "/Vendor-Product-Frontend/static/js/runtime-main.60d0958d.js.map",
+    "static/js/2.96dc2566.chunk.js": "/Vendor-Product-Frontend/static/js/2.96dc2566.chunk.js",
+    "static/js/2.96dc2566.chunk.js.map": "/Vendor-Product-Frontend/static/js/2.96dc2566.chunk.js.map",
+    "index.html": "/Vendor-Product-Frontend/index.html",
+    "precache-manifest.1839ac4086042f105d99a9de95b29261.js": "/Vendor-Product-Frontend/precache-manifest.1839ac4086042f105d99a9de95b29261.js",
+    "service-worker.js": "/Vendor-Product-Frontend/service-worker.js",
+    "static/css/main.ffba3b6a.chunk.css.map": "/Vendor-Product-Frontend/static/css/main.ffba3b6a.chunk.css.map",
+    "static/js/2.96dc2566.chunk.js.LICENSE.txt": "/Vendor-Product-Frontend/static/js/2.96dc2566.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.60d0958d.js",
+    "static/js/2.96dc2566.chunk.js",
+    "static/css/main.ffba3b6a.chunk.css",
+    "static/js/main.63f8096e.chunk.js"
+  ]
+}
