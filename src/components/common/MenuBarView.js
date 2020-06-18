@@ -8,6 +8,8 @@ import Typography from '@material-ui/core/Typography';
 
 import { ActionButton } from '../../common/buttons';
 
+import { APP_BASE } from '../../common/request_helpers';
+
 import './MenuBarView.scss';
 
 class MenuBarView extends React.Component {
@@ -43,7 +45,8 @@ class MenuBarView extends React.Component {
           <div className = "app-bar-buttons">
             <div>
               <ActionButton tag = "All Vendors" 
-                onClick = { () => this.props.history.push( "/vendors") }
+                onClick = { () => this.props.history.push( 
+                  APP_BASE + "/vendors") }
                 disabled = { this.state.view_name === "Vendors View" }
               />
             </div>

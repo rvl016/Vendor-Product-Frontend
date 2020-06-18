@@ -1,6 +1,8 @@
 const API_BASE = "https://vendor-product-api.herokuapp.com/api/"
 //const API_BASE =  "http://localhost:8000/api/"
 
+export const APP_BASE = "/Vendor-Product-Frontend";
+
 export const VENDORS_URL = dummy => API_BASE + "vendors";
 export const VENDOR_URL = vendor_id => API_BASE + `vendors/${ vendor_id }`;
 export const VENDOR_PRODUCTS_URL = vendor_id => API_BASE + `vendors/${ 

@@ -88,7 +88,7 @@ class VendorsView extends React.Component {
   }
 
   on_row_click = (event, vendor_id) => {
-    this.props.history.push( `/vendors/${ vendor_id }`); 
+    this.props.history.push( `${ helper.APP_BASE }/vendors/${ vendor_id }`); 
   }
 
   on_row_check = (event, vendor_id) => {
